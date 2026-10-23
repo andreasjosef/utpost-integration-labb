@@ -9,8 +9,10 @@ flowchart LR
   B[branch + commit] --> PR[pull request mot main]
   PR --> Q[Kvalitet<br/>npm ci · lint · format:check · test]
   PR --> BU[Bygg<br/>npm ci · build → artefakt]
+  PR --> I[Integration<br/>services: postgres + mongo · seed · migrate:logs · test:api]
   Q --> S{status checks<br/>gröna?}
   BU --> S
+  I --> S
   S -->|ja| M[merge – knappen är grön]
   S -->|nej| F[fixa, pusha igen<br/>körningen startar om]
   M --> MAIN[main är alltid byggbar]
@@ -24,15 +26,17 @@ flowchart LR
 | Format | `npm run format:check` (Prettier, bara kontroll) | filer som inte kördes genom Prettier – ändrar inget i CI, det gör man lokalt | ~2 s |
 | Test | `npm test` (`vitest run`) | ett röktest på guidevyn den här veckan (M1) – riktiga tester i M2 | ~3 s |
 | Bygg | `npm run build` (`vite build` av `client/`) | importfel, trasiga templates, allt som bara syns vid bygge | ~2 s |
+| Integration (M5) | services Postgres + Mongo → `npm ci` · `npm run seed` · `npm run migrate:logs` · `npm run test:api` | fel bakom vyn: resolvers, SQL, mätpunkterna i Mongo, inloggningskravet – och N+1 (`extensions.databasfragor` > 2) | 47 s på PR #2 (hela jobbet, inkl. containerstart); på `main`: fylls i efter merge |
 
 `npm ci` (~25 s) dominerar – den installerar alla tre workspaces inklusive React-klientens beroenden. När `web/` tas bort (M6) halveras tiden.
 
 ## Branch protection (ruleset på `main`)
 
 - Kräver PR – ingen pushar direkt till `main`
-- Kräver status checks **Kvalitet** och **Bygg** gröna innan merge
-- Kräver att branchen är uppdaterad mot `main` före merge (annars testas en kod som aldrig kommer att finnas)
-- Gäller även admins
+- Kräver status checks **Kvalitet**, **Bygg**, **Integration** och **Image** gröna innan merge (M5: Integration tillagd)
+- Kräver inte att branchen är uppdaterad mot `main` före merge (av i rulesetet just nu)
+- Ingen force push, `main` kan inte raderas
+- Gäller även admins (inga undantag i rulesetet)
 
 ## Vanliga fel vi sett
 

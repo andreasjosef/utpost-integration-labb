@@ -11,7 +11,7 @@ Vi ärvde en klient utan ett enda test och ett API vars kontrakt bara fanns i hu
 ## Nivåer
 - **Enhet (Vitest):** funktioner utan Vue i sig – `lib/tours.ts` (höjdmeter, formatering), senare validering och datum. Millisekunder, inga mockar.
 - **Komponent (Vitest + Vue Testing Library):** vyerna. Rendera, fråga som en användare (`getByRole`, `getByLabelText`), interagera med `user-event`. API-modulen mockad.
-- **API (från M5):** integrationstester mot GraphQL-servern med riktig databas, i pipelinen. Inte nu.
+- **API (från M5):** integrationstester mot GraphQL-servern med riktig databas (`api/src/graphql/server.test.js`, via `yoga.fetch` – ingen port), i pipelinen som jobbet Integration.
 - **E2E:** inte förrän M6. Då ett smoke-test mot staging.
 
 ## Karta: vad testas var
@@ -26,6 +26,7 @@ Vi ärvde en klient utan ett enda test och ett API vars kontrakt bara fanns i hu
 | `api.ts` | ingen egen | tre rader; testas indirekt genom komponenttesterna | – |
 | Inloggning (Pinia-store) | enhet på storen | logik utan UI; komponenttest på LoginView när den portas | nej |
 | Routern | ingen | Vue Routers beteende är inte vårt att testa | – |
+| GraphQL-API:et (M5) | integration, riktig Postgres + Mongo | det som gick sönder i M4 låg bakom vyn – resolvers, SQL, N+1; komponenttesterna mockar `useQuery` och ser det aldrig | ja, 6 st inkl. N+1-regression och inloggningskravet – `Tests 6 passed (6)`, `Duration 1.46s` lokalt (testerna själva ~0,2 s), 1.04s i Integration |
 
 ## Regler
 - En PR mergas bara när pipelinen är grön **och** ny logik har ett test som visar vad den ska göra.
@@ -46,4 +47,4 @@ Vue Router och Pinia (de har egna tester), CSS och klassnamn, exakt DOM-struktur
 Vi får skriva en label på varje formulärfält (annars hittar inte testet det) – det är en fördel, inte en kostnad. Komponenttester tar sekunder, inte millisekunder: håll dem få och riktade. Den dagen API:et mockas på ett annat sätt (MSW?) skrivs den här filen om.
 
 ## Kommandon
-`npm test` (en gång, som i pipelinen) · `npm run test:watch --workspace=client`
+`npm test` (klientens, en gång, som i pipelinen) · `npm run test:watch --workspace=client` · `npm run test:api` (API:ets integrationstester – kräver `docker compose up -d postgres mongo`, `npm run seed`, `npm run migrate:logs`)

@@ -68,8 +68,8 @@ query Turer { tours { title user { displayName } } }
 
 | | Databasfrågor | Källa |
 |---|---|---|
-| Före (M4, en fråga per tur) | 51 | M4-mätningen |
-| Efter (DataLoader) | 2 | GraphiQL, `extensions.databasfragor` och API-loggen `graphql Turer: 2 databasfrågor` |
+| Före (M4, en fråga per tur) | 51 | Bevisat av testet: med DataLoader bortkopplad i `Tour.user` blir det första testet i `api/src/graphql/server.test.js` rött med `AssertionError: expected 51 to be less than or equal to 2` (`Tests 1 failed \| 5 passed (6)`) |
+| Efter (DataLoader) | 2 | GraphiQL, `extensions.databasfragor` och API-loggen `graphql Turer: 2 databasfrågor` – låst av samma test (`npm run test:api`) |
 
 ## Deploy
 
