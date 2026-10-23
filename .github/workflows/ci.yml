@@ -51,7 +51,6 @@ jobs:
           name: client-dist
           path: client/dist
           retention-days: 7
-
   image:
     name: Image
     runs-on: ubuntu-latest

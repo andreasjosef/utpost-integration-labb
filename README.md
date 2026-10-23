@@ -58,6 +58,19 @@ Pipelinen (jobbet *Image* i `.github/workflows/ci.yml`) bygger `api` och `client
     ghcr.io/<ägare>/<repo>-api:sha-1a2b3c4
     ghcr.io/<ägare>/<repo>-client:sha-1a2b3c4
 
+## Mätning före/efter (M5)
+
+Turlistan i GraphiQL, med antalet databasfrågor ur `extensions.databasfragor`:
+
+```graphql
+query Turer { tours { title user { displayName } } }
+```
+
+| | Databasfrågor | Källa |
+|---|---|---|
+| Före (M4, en fråga per tur) | 51 | M4-mätningen |
+| Efter (DataLoader) | 2 | GraphiQL, `extensions.databasfragor` och API-loggen `graphql Turer: 2 databasfrågor` |
+
 ## Deploy
 
 Kommer i M6.
